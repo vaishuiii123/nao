@@ -39,12 +39,12 @@ export default function Login({ onLogin }: Props) {
           placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-xl px-5 py-4 mb-8 text-xl"
+          className="w-full border rounded-xl px-5 py-2.5 mb-8 text-sm"
         />
 
         <button
           onClick={handleLogin}
-          className="w-full bg-[#98002E] text-white py-4 rounded-xl text-2xl font-semibold"
+          className="w-full bg-[#98002E] text-white py-2.5 rounded-xl text-2xl font-semibold"
         >
           Login
         </button>

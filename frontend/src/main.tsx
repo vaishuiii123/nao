@@ -1,19 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
-import { BrowserRouter } from "react-router-dom";
-
 import App from "./App";
-
 import "./index.css";
 import "./App.css";
 
-import { PublicClientApplication } from "@azure/msal-browser";
-import { MsalProvider } from "@azure/msal-react";
-import { msalConfig } from "./auth/authConfig";
-
-const msalInstance =
-  new PublicClientApplication(msalConfig);
+import {
+  BrowserRouter,
+} from "react-router-dom";
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -21,16 +14,12 @@ ReactDOM.createRoot(
 
   <React.StrictMode>
 
-    <BrowserRouter>
+    <BrowserRouter basename="/nao-local">
 
-      <MsalProvider instance={msalInstance}>
-
-        <App />
-
-      </MsalProvider>
+      <App />
 
     </BrowserRouter>
- 
+
   </React.StrictMode>
 
 );

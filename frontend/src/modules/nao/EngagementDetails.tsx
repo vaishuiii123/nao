@@ -1,13 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+//import DynamicFieldRenderer from "./DynamicFieldRenderer";
+import DynamicFieldRenderer from "./DynamicFieldRenderer";
 type Props = {
   user: {
     name: string;
     email: string;
   };
+
+  formData: any;
+
+  setFormData: any;
+
+  onNext: () => void;
 };
 
-export default function EngagementDetails({ user }: Props) {
+export default function EngagementDetails({
+
+  user,
+
+  formData,
+
+  setFormData,
+
+  onNext,
+
+}: Props) {
+
+  const [dynamicFields, setDynamicFields] =
+    useState<any[]>([]);
+
+  const [files, setFiles] =
+    useState<File[]>([]);
+
+  const [errors, setErrors] =
+    useState({
+
+      clientName: "",
+
+      engagementPartner: "",
+
+      engagementManager: "",
+
+      otherTeamMembers: "",
+    });
+
+  /* =========================================
+      DROPDOWNS
+  ========================================== */
 
   const auditTypes = [
     "Statutory Audit",
@@ -41,29 +81,14 @@ export default function EngagementDetails({ user }: Props) {
     "No",
   ];
 
-  const [formData, setFormData] = useState({
-    clientName: "",
-    engagementPartner: "",
-    engagementManager: "",
-    otherTeamMembers: "",
-    auditType: "",
-    listedCompany: "",
-    auditRisk: "",
-    region: "",
-    engagementYearEnd: "",
-    subsidiary: "",
-    reviewDone: "",
-    reportReleaseDate: "",
-  });
+   const ReviewForm = [
+    "Yes",
+    "No",
+  ];
 
-  const [errors, setErrors] = useState({
-    clientName: "",
-    engagementPartner: "",
-    engagementManager: "",
-    otherTeamMembers: "",
-  });
-
-  const [files, setFiles] = useState<File[]>([]);
+  /* =========================================
+      HANDLE CHANGE
+  ========================================== */
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -74,18 +99,47 @@ export default function EngagementDetails({ user }: Props) {
   ) => {
 
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
 
+      ...formData,
+
+      [e.target.name]:
+        e.target.value,
+    });
   };
 
-  const isValidEmailList = (emails: string) => {
+  /* =========================================
+      LOAD DYNAMIC FIELDS
+  ========================================== */
 
-    const emailArray = emails
-      .split(";")
-      .map((e) => e.trim())
-      .filter((e) => e !== "");
+  useEffect(() => {
+
+    const savedFields =
+      localStorage.getItem(
+        "dynamicFields"
+      );
+
+    if (savedFields) {
+
+      setDynamicFields(
+        JSON.parse(savedFields)
+      );
+    }
+
+  }, []);
+
+  /* =========================================
+      EMAIL VALIDATION
+  ========================================== */
+
+  const isValidEmailList = (
+    emails: string
+  ) => {
+
+    const emailArray =
+      emails
+        .split(";")
+        .map((e) => e.trim())
+        .filter((e) => e !== "");
 
     const emailRegex =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,50 +152,68 @@ export default function EngagementDetails({ user }: Props) {
     );
   };
 
+  /* =========================================
+      VALIDATE
+  ========================================== */
+
   const validateForm = () => {
 
     let newErrors = {
+
       clientName: "",
+
       engagementPartner: "",
+
       engagementManager: "",
+
       otherTeamMembers: "",
     };
 
     let isValid = true;
 
-    if (!formData.clientName.trim()) {
+    if (
+      !formData.clientName?.trim()
+    ) {
+
       newErrors.clientName =
         "Client Name is required";
+
       isValid = false;
     }
 
     if (
       !isValidEmailList(
-        formData.engagementPartner
+        formData.engagementPartner || ""
       )
     ) {
+
       newErrors.engagementPartner =
         "Enter valid emails separated by ;";
+
       isValid = false;
     }
 
     if (
       !isValidEmailList(
-        formData.engagementManager
+        formData.engagementManager || ""
       )
     ) {
+
       newErrors.engagementManager =
         "Enter valid emails separated by ;";
+
       isValid = false;
     }
 
     if (
       !isValidEmailList(
-        formData.otherTeamMembers
+        formData.otherTeamMembers || ""
       )
     ) {
+
       newErrors.otherTeamMembers =
         "Enter valid emails separated by ;";
+
       isValid = false;
     }
 
@@ -158,33 +230,39 @@ export default function EngagementDetails({ user }: Props) {
         NAO Consultation
       </h2>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        {/* Client Name */}
+        {/* CLIENT NAME */}
+
         <div className="col-span-2">
 
           <label className="form-label">
+
             Client Name
             <span className="required">*</span>
+
           </label>
 
           <input
             type="text"
             name="clientName"
-            value={formData.clientName}
+            value={formData.clientName || ""}
             onChange={handleChange}
             className="form-input"
           />
 
           {errors.clientName && (
+
             <p className="text-red-500 text-xs mt-1">
               {errors.clientName}
             </p>
+
           )}
 
         </div>
 
-        {/* User */}
+        {/* USER */}
+
         <div className="col-span-2">
 
           <label className="form-label">
@@ -200,81 +278,74 @@ export default function EngagementDetails({ user }: Props) {
 
         </div>
 
-        {/* Engagement Partner */}
+        {/* ENGAGEMENT PARTNER */}
         <div>
 
           <label className="form-label">
+
             Email ID of Engagement Partner
             <span className="required">*</span>
+
           </label>
 
           <input
             type="text"
             name="engagementPartner"
-            value={formData.engagementPartner}
+            value={
+              formData.engagementPartner || ""
+            }
             onChange={handleChange}
             placeholder="abc@knavus.com; xyz@knavus.com"
             className="form-input"
           />
 
-          {errors.engagementPartner && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.engagementPartner}
-            </p>
-          )}
-
         </div>
 
-        {/* Engagement Manager */}
+        {/* ENGAGEMENT MANAGER */}
         <div>
 
           <label className="form-label">
+
             Email ID of Engagement Manager
             <span className="required">*</span>
+
           </label>
 
           <input
             type="text"
             name="engagementManager"
-            value={formData.engagementManager}
+            value={
+              formData.engagementManager || ""
+            }
             onChange={handleChange}
-            placeholder="manager@knavus.com; abc@knavus.com"
             className="form-input"
           />
 
-          {errors.engagementManager && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.engagementManager}
-            </p>
-          )}
-
         </div>
 
-        {/* Other Team Members */}
+        {/* OTHER TEAM MEMBERS */}
         <div className="col-span-2">
 
           <label className="form-label">
+
             Email ID of Other Team Members
             <span className="required">*</span>
+
           </label>
 
           <textarea
             name="otherTeamMembers"
-            value={formData.otherTeamMembers}
+            value={
+              formData.otherTeamMembers || ""
+            }
             onChange={handleChange}
-            placeholder="abc@knavus.com; xyz@knavus.com"
             className="form-textarea"
+            rows={4}
           />
-
-          {errors.otherTeamMembers && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.otherTeamMembers}
-            </p>
-          )}
 
         </div>
 
-        {/* Audit Type */}
+        {/* Audit/Attest Engagement Type */}
         <div>
 
           <label className="form-label">
@@ -283,24 +354,31 @@ export default function EngagementDetails({ user }: Props) {
 
           <select
             name="auditType"
-            value={formData.auditType}
+            value={formData.auditType || ""}
             onChange={handleChange}
             className="form-select"
           >
 
-            <option value="">-- Select --</option>
+            <option value="">
+              -- Select --
+            </option>
 
             {auditTypes.map((item) => (
-              <option key={item} value={item}>
+
+              <option
+                key={item}
+                value={item}
+              >
                 {item}
               </option>
+
             ))}
 
           </select>
 
         </div>
 
-        {/* Listed Company */}
+        {/* Listed Company/PCAOB/SPAC */}
         <div>
 
           <label className="form-label">
@@ -309,24 +387,33 @@ export default function EngagementDetails({ user }: Props) {
 
           <select
             name="listedCompany"
-            value={formData.listedCompany}
+            value={
+              formData.listedCompany || ""
+            }
             onChange={handleChange}
             className="form-select"
           >
 
-            <option value="">-- Select --</option>
+            <option value="">
+              -- Select --
+            </option>
 
             {listedCompanies.map((item) => (
-              <option key={item} value={item}>
+
+              <option
+                key={item}
+                value={item}
+              >
                 {item}
               </option>
+
             ))}
 
           </select>
 
         </div>
 
-        {/* Subsidiary */}
+        {/* Subsidiary of a Listed Co */}
         <div>
 
           <label className="form-label">
@@ -334,25 +421,98 @@ export default function EngagementDetails({ user }: Props) {
           </label>
 
           <select
-            name="subsidiary"
-            value={formData.subsidiary}
+            name="subsidiaryOptions"
+            value={
+              formData.subsidiaryOptions || ""
+            }
             onChange={handleChange}
             className="form-select"
           >
 
-            <option value="">-- Select --</option>
+            <option value="">
+              -- Select --
+            </option>
 
             {subsidiaryOptions.map((item) => (
-              <option key={item} value={item}>
+
+              <option
+                key={item}
+                value={item}
+              >
                 {item}
               </option>
+
             ))}
 
           </select>
 
         </div>
 
-        {/* Audit Risk */}
+       {/* Audit Risk Classification Type */}
+        <div>
+          <label className="form-label">
+            Audit Risk Classification Type
+          </label>
+
+          <select
+            name="auditRiskType"
+            value={formData.auditRiskType || ""}
+            onChange={handleChange}
+            className="form-select"
+          >
+
+            <option value="">
+              -- Select --
+            </option>
+
+            {auditRiskTypes.map((item) => (
+
+              <option
+                key={item}
+                value={item}
+              >
+                {item}
+              </option>
+
+            ))}
+
+          </select>
+
+        </div>
+
+         {/* Review of Form Done by Engagement Partner – (Mandatory) */}
+        <div>
+
+          <label className="form-label">
+           Review of Form Done by Engagement Partner – (Mandatory)
+          </label>
+
+          <select
+            name="ReviewForm"
+            value={
+              formData.ReviewForm || ""
+            }
+            onChange={handleChange}
+            className="form-select"
+          >
+
+            <option value="">
+              -- Select --
+            </option>
+
+            {ReviewForm.map((item) => (
+
+              <option
+                key={item}
+                value={item}
+              >
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
+
+       {/* Audit Risk Classification Type */}
         <div>
 
           <label className="form-label">
@@ -360,243 +520,215 @@ export default function EngagementDetails({ user }: Props) {
           </label>
 
           <select
-            name="auditRisk"
-            value={formData.auditRisk}
+            name="auditRiskType"
+            value={formData.auditRiskType || ""}
             onChange={handleChange}
             className="form-select"
           >
 
-            <option value="">-- Select --</option>
+            <option value="">
+              -- Select --
+            </option>
 
             {auditRiskTypes.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
 
-          </select>
-
-        </div>
-
-        {/* Review Done */}
-        <div>
-
-          <label className="form-label">
-            Review of Form Done by Engagement Partner
-          </label>
-
-          <select
-            name="reviewDone"
-            value={formData.reviewDone}
-            onChange={handleChange}
-            className="form-select"
-          >
-
-            <option value="">-- Select --</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-
-          </select>
-
-        </div>
-
-        {/* Report Release Date */}
-        <div>
-
-          <label className="form-label">
-            Audit/Attest Report Release Date
-          </label>
-
-          <input
-            type="date"
-            name="reportReleaseDate"
-            value={formData.reportReleaseDate}
-            onChange={handleChange}
-            className="form-input"
-          />
-
-        </div>
-
-        {/* Region */}
-        <div>
-
-          <label className="form-label">
-            Region
-          </label>
-
-          <select
-            name="region"
-            value={formData.region}
-            onChange={handleChange}
-            className="form-select"
-          >
-
-            <option value="">-- Select --</option>
-
-            {regions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-
-          </select>
-
-        </div>
-
-        {/* Engagement Year End */}
-        <div>
-
-          <label className="form-label">
-            Engagement Year End
-          </label>
-
-          <input
-            type="date"
-            name="engagementYearEnd"
-            value={formData.engagementYearEnd}
-            onChange={handleChange}
-            className="form-input"
-          />
-
-        </div>
-
-        {/* Attachment */}
-        <div className="col-span-2">
-
-          <label className="form-label">
-            Attachment
-          </label>
-
-          <input
-  type="file"
-  multiple
-  accept=".doc,.docx,.xls,.xlsx,.pdf"
-  onChange={(e) => {
-
-    if (!e.target.files) return;
-
-    const selectedFiles =
-      Array.from(e.target.files);
-
-    setFiles((prev) => [
-      ...prev,
-      ...selectedFiles,
-    ]);
-
-  }}
-  className="form-input"
-/>
-          <div className="mt-3 space-y-2">
-
-            {files.map((file, index) => (
-
-              <div
-                key={index}
-                className="flex items-center justify-between border rounded-md px-4 py-3 bg-gray-50"
+              <option
+                key={item}
+                value={item}
               >
-
-                <div className="flex items-center gap-4">
-
-                  <span className="text-sm text-gray-700">
-                    {file.name}
-                  </span>
-<button
-  type="button"
-  onClick={() => {
-
-    const extension =
-      file.name.split(".").pop()?.toLowerCase();
-
-    const fileURL =
-      URL.createObjectURL(file);
-
-    // PDF Preview
-    if (extension === "pdf") {
-
-      window.open(fileURL, "_blank");
-
-    }
-
-    // Word / Excel Download
-    else if (
-      extension === "doc" ||
-      extension === "docx" ||
-      extension === "xls" ||
-      extension === "xlsx"
-    ) {
-
-      const link =
-        document.createElement("a");
-
-      link.href = fileURL;
-      link.download = file.name;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-    }
-
-    else {
-
-      alert(
-        "Preview not supported for this file type."
-      );
-
-    }
-
-  }}
-  className="text-blue-600 text-sm font-medium hover:underline"
->
-  Preview
-</button>
-
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-
-                    const updatedFiles =
-                      files.filter(
-                        (_, i) => i !== index
-                      );
-
-                    setFiles(updatedFiles);
-
-                  }}
-                  className="text-red-500 text-sm font-medium hover:text-red-700"
-                >
-                  Remove
-                </button>
-
-              </div>
+                {item}
+              </option>
 
             ))}
 
-          </div>
+          </select>
 
         </div>
 
       </div>
+     
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      
+      {/* =========================================
+    Audit/Attest Report Release Date
+    ========================================== */}
+      <div>
+        <label className="form-label">
+          Audit/Attest Report Release Date
+          <span className="required">*</span>
+        </label>
 
-      {/* Buttons */}
+        <input
+          type="date"
+          name="engagementStartDate"
+          value={
+            formData.engagementStartDate || ""
+          }
+          onChange={handleChange}
+          className="form-input"
+        />
+
+      </div>
+
+  {/* Project Code */}
+  <div>
+          <label className="form-label">
+            Project Code
+            <span className="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            name="projectCode"
+            value={
+              formData.projectCode || ""
+            }
+            onChange={handleChange}
+            className="form-input"
+          />
+
+  </div>
+
+</div>
+
+      {/* =========================================
+          ATTACHMENT
+      ========================================== */}
+
+      <div className="mt-6">
+
+        <label className="form-label">
+          Attachment
+        </label>
+
+        <input
+          type="file"
+          multiple
+          accept=".doc,.docx,.xls,.xlsx,.pdf"
+          onChange={(e) => {
+
+            if (!e.target.files) return;
+
+            const selectedFiles =
+              Array.from(e.target.files);
+
+            setFiles((prev) => [
+              ...prev,
+              ...selectedFiles,
+            ]);
+
+          }}
+          className="form-input"
+        />
+
+      </div>
+
+      {/* FILES */}
+
+      <div className="mt-4 space-y-2">
+
+        {files.map((file, index) => (
+
+          <div
+            key={index}
+            className="
+              flex
+              items-center
+              justify-between
+              border
+              rounded-md
+              px-4
+              py-3
+              bg-gray-50
+            "
+          >
+
+            <span className="text-sm">
+              {file.name}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+
+                const updated =
+                  files.filter(
+                    (_, i) =>
+                      i !== index
+                  );
+
+                setFiles(updated);
+
+              }}
+              className="
+                text-red-500
+                text-sm
+              "
+            >
+              Remove
+            </button>
+
+          </div>
+
+        ))}
+
+      </div>
+
+      {/* =========================================
+          DYNAMIC FIELDS
+      ========================================== */}
+
+      {dynamicFields
+        .filter(
+          (field) =>
+            field.tab === "engagement"
+        )
+        .map((field) => (
+
+          <DynamicFieldRenderer
+            key={field.id}
+            field={field}
+          />
+
+      ))}
+
+      {/* =========================================
+          BUTTONS
+      ========================================== */}
+
       <div className="flex justify-end gap-4 mt-8">
 
-        <button className="bg-gray-200 px-6 py-2 rounded-lg">
+        <button
+          className="
+            bg-gray-200
+            px-6
+            py-2
+            rounded-lg
+          "
+        >
           Save as Draft
         </button>
 
         <button
-          type="button"
-          className="bg-[#98002E] text-white px-8 py-3 rounded-lg"
+
           onClick={() => {
 
-            if (validateForm()) {
-              alert("Form Submitted Successfully");
-            }
+            if (
+              validateForm()
+            ) {
 
+              onNext();
+            }
           }}
+
+          className="
+            bg-[#98002E]
+            text-white
+            px-6
+            py-3
+            rounded-xl
+            font-medium
+          "
         >
           Next
         </button>

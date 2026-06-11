@@ -1,5 +1,5 @@
 {
-  "name": "nao-server",
+  "name": "nao-local-server",
   "version": "1.0.0",
   "description": "NAO Consultation",
   "main": "server.js",

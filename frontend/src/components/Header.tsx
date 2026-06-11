@@ -1,55 +1,47 @@
 
-import knavLogo from "../images/KNAV logo.png"; // fix name if needed
+import knavLogo from "../images/knav_white.png";  // fix name if needed
+import { Bell } from "lucide-react"; // install if needed
+import { User } from "lucide-react";
 
-type Props = {
-  user: {
-    name: string;
-    email: string;
-  };
-  onLogout: () => void;
-};
 
-export default function Header({ user, onLogout }: Props) {
+
+export default function Header () {
   return (
-    <header className="h-14 bg-[#F3F3F3] flex items-center justify-between px-6 border-b border-gray-300">
+    
+ <div>
+
+      <header className="h-15 bg-[#6a0b23] 
+        flex items-center justify-between px-7 
+        rounded-2xl shadow-md">
 
       {/* LEFT SECTION */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         
         {/* Logo */}
         <img
           src={knavLogo}
           alt="KNAV Logo"
-          className="h-8 object-contain"
+          className="h-11 object-contain"
         />
-
-        {/* Divider (subtle) */}
-        <div className="h-6 w-px bg-gray-300"></div>
 
       </div>
 
       {/* RIGHT SECTION */}
-      <div className="flex flex-col items-end text-xs text-gray-700 leading-tight">
+      
+        <div className="flex items-center gap-4">
 
-        {/* User Email */}
-        <span className="font-medium text-sm">
-          {user.email}
-        </span>
+          <div className="bg-white/20 p-2 rounded-full">
+            <Bell className="text-white" size={12} />
+          </div>
+          
+        <div className="bg-white p-[3px] rounded-full">
+            <User className="text-gray-700" size={25} />
 
-        {/* Team Name */}
-        <span className="text-[11px] text-gray-500">
-          (NAO Core Team)
-        </span>
+      </div>     
+       </div>
 
-        {/* Logout */}
-        <button
-          onClick={onLogout}
-          className="text-[#98002E] underline text-xs mt-1 hover:text-red-700"
-        >
-          Logout
-        </button>
-      </div>
 
     </header>
+    </div>
   );
 }
