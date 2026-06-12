@@ -12,7 +12,10 @@ type Props = {
   onLogout: () => void;
 };
 
-export default function MainLayout() {
+export default function MainLayout({
+  user,
+  onLogout,
+}: Props) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
